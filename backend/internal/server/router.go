@@ -1,8 +1,9 @@
 package server
 
 import (
-	"avadnet/internal/config"
+	"avadnet/backend/internal/config"
 	"net/http"
+	"time"
 
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
@@ -35,8 +36,17 @@ func NewRouter(cfg *config.Config) *gin.Engine {
 	router := gin.Default()
 	//Init router security headers
 	router.Use(SecurityHeaders())
-	if cfg.Env == "production" {
+	if cfg.AppEnv == "production" {
 		router.Use(static.Serve("/", static.LocalFile("./public/", true)))
 	}
 	return router
+}
+
+func Run(router *gin.Engine, cfg *config.Config) {
+	srv := &http.Server{
+		Addr:              ":" + cfg.Port,
+		Handler:           router,
+		ReadHeaderTimeout: 5 * time.Second,
+	}
+	srv.ListenAndServe()
 }
