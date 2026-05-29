@@ -1,12 +1,12 @@
 package main
 
 import (
-	"avadnet/internal/config"
-	"avadnet/internal/server"
+	"avadnet/backend/internal/api"
+	"avadnet/backend/internal/config"
 )
 
 func main() {
 	cfg := config.Load()
-	router := server.NewRouter(cfg)
-	server.Run(router, cfg)
+	router := api.NewRouter(cfg)
+	api.Run(router, cfg)
 }
