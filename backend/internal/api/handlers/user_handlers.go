@@ -1,8 +1,11 @@
 package handlers
 
 import (
+	"net/http"
+	"time"
+
+	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 // User Creation Request
@@ -42,11 +45,11 @@ type DeleteUserRequest struct {
 
 // User Response
 type UserResponse struct {
-	ID        uuid.UUID        `json:"id"`
-	Username  string           `json:"username"`
-	Email     string           `json:"email"`
-	CreatedAt pgtype.Timestamp `json:"created_at"`
-	UpdatedAt pgtype.Timestamp `json:"updated_at"`
+	ID        uuid.UUID `json:"id"`
+	Username  string    `json:"username"`
+	Email     string    `json:"email"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 // User Login Response (with auth token)
@@ -61,4 +64,33 @@ type ListUsersResponse struct {
 	Total  int            `json:"total"`
 	Limit  int            `json:"limit"`
 	Offset int            `json:"offset"`
+}
+
+// RegisterUser handles user registration.
+// It validates the incoming request and returns a created UserResponse.
+func RegisterUser(c *gin.Context) {
+	var req CreateUserRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// NOTE: persistence is not implemented yet. We return a minimal created response.
+	id := uuid.New()
+	now := time.Now()
+
+	resp := UserResponse{
+		ID:        id,
+		Username:  req.Username,
+		Email:     req.Email,
+		CreatedAt: now,
+		UpdatedAt: now,
+	}
+
+	c.JSON(http.StatusCreated, resp)
+}
+
+// LoginUser is a placeholder login handler returning 501 Not Implemented.
+func LoginUser(c *gin.Context) {
+	c.JSON(http.StatusNotImplemented, gin.H{"error": "login not implemented"})
 }

@@ -36,6 +36,8 @@ func NewRouter(cfg *config.Config) *gin.Engine {
 	router := gin.Default()
 	//Init router security headers
 	router.Use(SecurityHeaders())
+	// Register API routes
+	RegisterRoutes(router, cfg)
 	if cfg.AppEnv == "production" {
 		router.Use(static.Serve("/", static.LocalFile("./public/", true)))
 	}

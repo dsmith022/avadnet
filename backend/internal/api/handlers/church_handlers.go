@@ -1,8 +1,11 @@
 package handlers
 
 import (
+	"net/http"
+	"time"
+
+	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 // Church Creation Request
@@ -59,21 +62,21 @@ type UpdateChurchMemberRoleRequest struct {
 
 // Church Response
 type ChurchResponse struct {
-	ID          uuid.UUID        `json:"id"`
-	Name        string           `json:"name"`
-	Description string           `json:"description"`
-	CreatedAt   pgtype.Timestamp `json:"created_at"`
-	UpdatedAt   pgtype.Timestamp `json:"updated_at"`
+	ID          uuid.UUID `json:"id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 // Church Member Response
 type ChurchMemberResponse struct {
-	UserID    uuid.UUID        `json:"user_id"`
-	ChurchID  uuid.UUID        `json:"church_id"`
-	Role      string           `json:"role"`
-	Username  string           `json:"username"`
-	Email     string           `json:"email"`
-	CreatedAt pgtype.Timestamp `json:"created_at,omitempty"`
+	UserID    uuid.UUID `json:"user_id"`
+	ChurchID  uuid.UUID `json:"church_id"`
+	Role      string    `json:"role"`
+	Username  string    `json:"username"`
+	Email     string    `json:"email"`
+	CreatedAt time.Time `json:"created_at,omitempty"`
 }
 
 // List Churches Response
@@ -90,4 +93,43 @@ type ListChurchMembersResponse struct {
 	Total   int                    `json:"total"`
 	Limit   int                    `json:"limit"`
 	Offset  int                    `json:"offset"`
+}
+
+// Placeholder handlers for church endpoints. These return 501 Not Implemented
+// until business logic and persistence are implemented.
+
+func CreateChurch(c *gin.Context) {
+	c.JSON(http.StatusNotImplemented, gin.H{"error": "create church not implemented"})
+}
+
+func ListChurches(c *gin.Context) {
+	c.JSON(http.StatusNotImplemented, gin.H{"error": "list churches not implemented"})
+}
+
+func GetChurch(c *gin.Context) {
+	c.JSON(http.StatusNotImplemented, gin.H{"error": "get church not implemented"})
+}
+
+func UpdateChurch(c *gin.Context) {
+	c.JSON(http.StatusNotImplemented, gin.H{"error": "update church not implemented"})
+}
+
+func DeleteChurch(c *gin.Context) {
+	c.JSON(http.StatusNotImplemented, gin.H{"error": "delete church not implemented"})
+}
+
+func AddChurchMember(c *gin.Context) {
+	c.JSON(http.StatusNotImplemented, gin.H{"error": "add church member not implemented"})
+}
+
+func ListChurchMembers(c *gin.Context) {
+	c.JSON(http.StatusNotImplemented, gin.H{"error": "list church members not implemented"})
+}
+
+func UpdateChurchMemberRole(c *gin.Context) {
+	c.JSON(http.StatusNotImplemented, gin.H{"error": "update church member role not implemented"})
+}
+
+func RemoveChurchMember(c *gin.Context) {
+	c.JSON(http.StatusNotImplemented, gin.H{"error": "remove church member not implemented"})
 }
