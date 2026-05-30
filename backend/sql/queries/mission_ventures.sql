@@ -39,3 +39,12 @@ SELECT *
 FROM venture_members
 WHERE venture_id = $1
 ORDER BY created_at ASC;
+
+-- name: ListUserVentures :many
+SELECT ventures.name as venture_name, 
+ventures.id as venture_id, 
+venture_members.role as member_role
+FROM venture_members
+JOIN ventures on ventures.id = venture_members.venture_id
+WHERE venture_members.user_id = $1
+ORDER BY venture_members.created_at ASC;

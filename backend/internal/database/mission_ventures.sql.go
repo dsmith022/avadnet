@@ -99,6 +99,42 @@ func (q *Queries) GetVentureByID(ctx context.Context, id pgtype.UUID) (Venture, 
 	return i, err
 }
 
+const listUserVentures = `-- name: ListUserVentures :many
+SELECT ventures.name as venture_name, 
+ventures.id as venture_id, 
+venture_members.role as member_role
+FROM venture_members
+JOIN ventures on ventures.id = venture_members.venture_id
+WHERE venture_members.user_id = $1
+ORDER BY venture_members.created_at ASC
+`
+
+type ListUserVenturesRow struct {
+	VentureName string            `db:"venture_name" json:"venture_name"`
+	VentureID   pgtype.UUID       `db:"venture_id" json:"venture_id"`
+	MemberRole  MissionMemberRole `db:"member_role" json:"member_role"`
+}
+
+func (q *Queries) ListUserVentures(ctx context.Context, userID pgtype.UUID) ([]ListUserVenturesRow, error) {
+	rows, err := q.db.Query(ctx, listUserVentures, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListUserVenturesRow{}
+	for rows.Next() {
+		var i ListUserVenturesRow
+		if err := rows.Scan(&i.VentureName, &i.VentureID, &i.MemberRole); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listVentureMembers = `-- name: ListVentureMembers :many
 SELECT id, venture_id, user_id, role, created_at, updated_at
 FROM venture_members

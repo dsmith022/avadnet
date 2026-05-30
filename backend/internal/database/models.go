@@ -11,6 +11,49 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type ChurchMemberRole string
+
+const (
+	ChurchMemberRoleAdmin  ChurchMemberRole = "admin"
+	ChurchMemberRoleMember ChurchMemberRole = "member"
+	ChurchMemberRolePastor ChurchMemberRole = "pastor"
+)
+
+func (e *ChurchMemberRole) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = ChurchMemberRole(s)
+	case string:
+		*e = ChurchMemberRole(s)
+	default:
+		return fmt.Errorf("unsupported scan type for ChurchMemberRole: %T", src)
+	}
+	return nil
+}
+
+type NullChurchMemberRole struct {
+	ChurchMemberRole ChurchMemberRole `json:"church_member_role"`
+	Valid            bool             `json:"valid"` // Valid is true if ChurchMemberRole is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullChurchMemberRole) Scan(value interface{}) error {
+	if value == nil {
+		ns.ChurchMemberRole, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.ChurchMemberRole.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullChurchMemberRole) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.ChurchMemberRole), nil
+}
+
 type MissionMemberRole string
 
 const (
@@ -51,6 +94,23 @@ func (ns NullMissionMemberRole) Value() (driver.Value, error) {
 		return nil, nil
 	}
 	return string(ns.MissionMemberRole), nil
+}
+
+type Church struct {
+	ID          pgtype.UUID        `db:"id" json:"id"`
+	Name        string             `db:"name" json:"name"`
+	Description string             `db:"description" json:"description"`
+	CreatedAt   pgtype.Timestamptz `db:"created_at" json:"created_at"`
+	UpdatedAt   pgtype.Timestamptz `db:"updated_at" json:"updated_at"`
+}
+
+type ChurchMember struct {
+	ID        pgtype.UUID        `db:"id" json:"id"`
+	ChurchID  pgtype.UUID        `db:"church_id" json:"church_id"`
+	UserID    pgtype.UUID        `db:"user_id" json:"user_id"`
+	Role      ChurchMemberRole   `db:"role" json:"role"`
+	CreatedAt pgtype.Timestamptz `db:"created_at" json:"created_at"`
+	UpdatedAt pgtype.Timestamptz `db:"updated_at" json:"updated_at"`
 }
 
 type MissionMember struct {
